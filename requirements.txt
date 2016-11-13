@@ -2,3 +2,4 @@ textblob
 pika
 nltk
 tweepy
+HTMLParser

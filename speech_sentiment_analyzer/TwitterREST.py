@@ -5,6 +5,7 @@ import tweepy, json
 import ConfigParser
 from datetime import datetime, time
 import pika
+import time
 
 
 max_id = ""
@@ -12,26 +13,25 @@ max_id = ""
 class Tweet(object):
     def __init__(self, raw_tweet=None):
         self.text = raw_tweet.text
-        self.created_by = raw_tweet.created_by
+        self.created_at = raw_tweet.created_at
         self.id = raw_tweet.id_str
         self.retweet = raw_tweet.retweet_count
 
 
-def load_config(self, service=None):
+def load_config(service="Twitter"):
     """
     Reads the configuration from ini file
     @param service: service to which the API keys are required
     @return: dict of credentials for auth
     """
     Config = ConfigParser.ConfigParser()
-    Config.read("sentiment_analyzer/config.ini")
+    Config.read("config.ini")
     creds = {}
 
-    if service == "Twitter":
-        creds["key"] = Config.get("TwitterAuth", "key")
-        creds["secret"] = Config.get("TwitterAuth", "secret")
-        creds["token"] = Config.get("TwitterAuth", "token")
-        creds["token_secret"] = Config.get("TwitterAuth", "token_secret")
+    creds["key"] = Config.get("TwitterAuth", "key")
+    creds["secret"] = Config.get("TwitterAuth", "secret")
+    creds["token"] = Config.get("TwitterAuth", "token")
+    creds["token_secret"] = Config.get("TwitterAuth", "token_secret")
     return creds if creds != {} else None
 
 
@@ -68,49 +68,52 @@ def setup_messaging_queue():
     return channel, connection
 
 
-def getTweets(searchTerm="MLH"):
+def getTweets(searchTerm="MLHacks"):
     global max_id
-    try:
-        start_time = datetime.now()
-        print("Start time of run %s " % str(start_time))
+    # try:
+    start_time = datetime.now()
+    print("Start time of run %s " % str(start_time))
 
-        api = setupTwitterConnection()
-        channel, connection = setup_messaging_queue()
-        api_calls = 1
-        most_recent_tweet = None
-        while True:
-            if api_calls > 175:
-                pause_processing(start_time, minutes=16)
-                api_calls = 1
-                start_time = datetime.now()
+    api = setupTwitterConnection()
+    channel, connection = setup_messaging_queue()
+    api_calls = 1
+    most_recent_tweet = None
 
+    while True:
+        if api_calls > 175:
+            pause_processing(start_time, minutes=16)
+            api_calls = 1
+            start_time = datetime.now()
+
+        if max_id == "":
+            tweets = api.user_timeline(id=searchTerm, count=100)
+        else:
             tweets = api.user_timeline(id=searchTerm, max_id=max_id, count=100)
 
-            if tweets is None or tweets == []:
-                print("Breaking from empty raw_tweets")
-                break
-            else:
-                for tweet in tweets:
-                    T = Tweet(tweet)
+        if tweets is None or tweets == []:
+            print("Breaking from empty raw_tweets")
+            break
 
-                    if most_recent_tweet is None:
-                        most_recent_tweet = T.created_by
+        for tweet in tweets:
+            T = Tweet(tweet)
 
-                    # Skip the last processed tweet
-                    if max_id == T.id:
-                        continue
+            if most_recent_tweet is None:
+                most_recent_tweet = T.created_at
 
-                    message = "info: Hello World!"
-                    channel.basic_publish(exchange='twitter_exchange', routing_key='', body=message,
-                                          properties=pika.BasicProperties(delivery_mode=2))
-                    print(" [x] Sent %r" % message)
+            # Skip the last processed tweet
+            if max_id == T.id:
+                continue
 
-                    max_id = T.id
-                    api_calls += 1
-    except Exception as e:
-        print("Error in pulling twitter live stream data/n" + e)
-    finally:
-        connection.close()
+            message = "info: Hello World!"
+            channel.basic_publish(exchange='twitter_exchange', routing_key='', body=message,
+                                  properties=pika.BasicProperties(delivery_mode=2))
+            print(" [x] Sent %r" % message)
+
+            max_id = T.id
+            api_calls += 1
+    connection.close()
+    # except Exception as e:
+        # print(e)
 
 def main():
     getTweets()
