@@ -19,7 +19,7 @@ def get_sentiment_textblob(text):
     return [sentiment, score]
 
 def preprocess_text(tweet):
-    # tweet = tweet.decode("utf8").encode('ascii', 'ignore')
+    tweet = tweet.decode("utf8").encode('ascii', 'ignore')
     text = tweet.lower()
     html_parser = HTMLParser.HTMLParser()
     html_parsed_text = html_parser.unescape(text)

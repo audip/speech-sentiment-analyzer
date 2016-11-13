@@ -20,7 +20,10 @@ def is_hate_speech(sentence):
 def callback(ch, method, properties, body):
     print("[x] %r" % body)
 
-    tweet = mq_library.preprocess_text(body)
+    body_split = body.split("::")
+    text = body_split[0]
+
+    tweet = mq_library.preprocess_text(text)
     if not is_hate_speech(tweet):
         ch.basic_ack(delivery_tag = method.delivery_tag)
         return
