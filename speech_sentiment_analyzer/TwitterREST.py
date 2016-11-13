@@ -15,7 +15,7 @@ class Tweet(object):
         self.text = raw_tweet.text
         self.created_at = raw_tweet.created_at
         self.id = raw_tweet.id_str
-        self.retweet = raw_tweet.retweet_count
+        self.retweet = str(raw_tweet.retweet_count)
 
     def getJSON(self):
         tweet = {
@@ -26,7 +26,6 @@ class Tweet(object):
         }
 
         return tweet
-
 
 def load_config(service="Twitter"):
     """
@@ -114,13 +113,16 @@ def getTweets(searchTerm="MLHacks"):
             if max_id == T.id:
                 continue
 
-            message = json.dumps(T.getJSON())
+            # message = json.dumps(T.getJSON())
+            message = T.text+'::'+T.id+'::'+T.retweet+'::'+str(T.created_at)
             channel.basic_publish(exchange='twitter_exchange', routing_key='', body=message,
                                   properties=pika.BasicProperties(delivery_mode=2))
             print(" [x] Sent %r" % message)
 
             max_id = T.id
-            api_calls += 1
+
+        api_calls += 1
+
     connection.close()
     # except Exception as e:
         # print(e)
