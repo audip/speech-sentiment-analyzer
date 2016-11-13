@@ -9,7 +9,7 @@ def is_hate_speech(sentence):
         'violence','sex','sexual', 'assault', 'bullying', 'shooting',
         'threat', 'threatening', 'kill', 'terror', 'terrorism', 'crime',
         'criminal', 'bashing', 'shaming', 'slut', 'abusive', 'nigga',
-        'fuck', 'frick'
+        'fuck', 'frick', 'nigger'
     ])
     for word in sentence:
         if word in hate_words:
@@ -34,7 +34,7 @@ def callback(ch, method, properties, body):
     tweet_str = ' '.join(s for s in tweet)
 
     tweet_post = {'text':tweet_str,'id':body_split[1],
-    'retweet':body_split[2],'created_at':body_split[3],
+    'retweet': int(body_split[2]),'created_at':body_split[3],
     'sentiment': senti, 'score': score}
 
     if not is_hate_speech(tweet):
