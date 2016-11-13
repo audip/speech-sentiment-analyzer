@@ -13,9 +13,15 @@ def get_sentiment_textblob(text):
     # @param text: blob of text
     # @return list of (sentiment, score) -> ('pos', '0.33')
     """
-    blob = TextBlob(str(text), analyzer=NaiveBayesAnalyzer())
-    sentiment = blob.sentiment.classification
-    score = '{0:.4f}'.format(blob.sentiment.p_pos - blob.sentiment.p_neg)
+    blob = TextBlob(str(text))
+    score = blob.sentiment.polarity
+    # score = '{0:.2f}'.format(blob.sentiment.p_pos - blob.sentiment.p_neg)
+    sentiment = "Neutral"
+    if score > 0:
+        sentiment = "Positive"
+    elif score < 0:
+        sentiment = "Negative"
+    print(sentiment, score)
     return [sentiment, score]
 
 def preprocess_text(tweet):
@@ -33,12 +39,8 @@ def setup_messaging_queue():
                 host='localhost'))
     channel = connection.channel()
 
-    channel.exchange_declare(exchange='twitter_exchange',
-                                     type='fanout')
+    result = channel.queue_declare(queue='twitter_mq', durable=True)
 
-    result = channel.queue_declare(durable=True)
-    queue_name = result.method.queue
+    channel.basic_qos(prefetch_count=1)
 
-    channel.queue_bind(exchange='twitter_exchange',
-                               queue=queue_name)
-    return channel, queue_name
+    return channel
