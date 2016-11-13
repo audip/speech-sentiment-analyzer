@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="Saurabh" content="">
+
+    <title>Hack the Harassment</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../static/css/ionicons.min.css" rel="stylesheet">
+    <link href="../static/css/style.css" rel="stylesheet">
+	<!--Import Google Icon Font-->
+	<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<!-- Compiled and minified CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+  </head>
+
+  <body>
+
+    <div id="h">
+      <div class="logo">!Harass Shut!</div>
+      <div class="container">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2 centered">
+            <h1>Stop the harassment!</h1>
+            <div class="mtb" align="center">
+              <form role="form" action="" method="post" enctype="plain">
+                <input type="textbox" name="searchBox" class="subscribe-input" placeholder="Enter your search..." required>
+                <button class='btn btn-conf btn-green' name="searchBox" type="submit">Search</button>
+              </form>
+            </div><!--/mt-->
+          </div>
+        </div><!--/row-->
+      </div><!--/container-->
+    </div><!-- /H -->
+
+    <div class="container ptb">
+      <div class="row centered">
+        <h2 class="mb">Our Pricing Model<br/>It's Quite Easy To Understand.</h2>
+        <div class="col-md-6">
+          <div class="price-table">
+			<div class="col s12 l6">
+			  {% for tweet in hateTweets %}
+				  <div class="col s6 l6" style="opacity: 0.8">
+					<div class="card deep-orange lighten-1">
+					  <div class="card-content white-text">
+						<span class="card-title">{{ tweet['id'] }}</span>
+						<p><i>"{{ tweet['text'] }}"</i></p>
+					  </div>
+					  <div class="card-action">
+						<a class="white-text" href="#">Retweets: {{ item.retweet }}</a>
+					  </div>
+					</div>
+				  </div>
+			  {% endfor %}
+			</div>
+          </div><!--/price-table-->
+        </div><!--/col-md-4-->
+
+         <div class="col-md-6">
+          <div class="price-table">
+              <div class="col s12 l6">
+                <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+              </div>
+          </div><!--/price-table-->
+        </div><!--/col-md-4-->
+      </div><!--/row-->
+    </div><!--/container-->
+    <script type="text/javascript">
+       $(function () {
+         var pos = {{ positive }}
+         var neg = {{ negative }}
+        // Radialize the colors
+        Highcharts.getOptions().colors = Highcharts.map(Highcharts.getOptions().colors, function (color) {
+          return {
+            radialGradient: {
+              cx: 0.5,
+              cy: 0.3,
+              r: 0.7
+            },
+            stops: [
+            [0, color],
+                    [1, Highcharts.Color(color).brighten(-0.3).get('rgb')] // darken
+                    ]
+                  };
+                });
+
+        // Build the chart
+        Highcharts.chart('container', {
+          chart: {
+            plotBackgroundColor: null,
+            plotBorderWidth: null,
+            plotShadow: false,
+            type: 'pie'
+          },
+          title: {
+            text: 'Hate Speech Analysis for Large Scale Events'
+          },
+          tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+          },
+          plotOptions: {
+            pie: {
+              allowPointSelect: true,
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: true,
+                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                style: {
+                  color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                },
+                connectorColor: 'silver'
+              }
+            }
+          },
+          series: [{
+            name: 'Brands',
+            data: [
+            { name: 'Positive', y: pos },
+            {
+              name: 'Negative',
+              y: neg,
+              sliced: true,
+              selected: true
+            }]
+          }]
+        });
+      });
+    </script>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="../static/js/jquery.min.js"></script>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/retina-1.1.0.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+  </body>
+</html>
