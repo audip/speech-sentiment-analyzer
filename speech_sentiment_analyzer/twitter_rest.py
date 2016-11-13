@@ -87,6 +87,7 @@ def getTweets(searchTerm="MLHacks"):
     channel, connection = setup_messaging_queue()
     api_calls = 1
     most_recent_tweet = None
+    count = 0
 
     while True:
         if api_calls > 175:
@@ -105,6 +106,7 @@ def getTweets(searchTerm="MLHacks"):
 
         for tweet in tweets:
             T = Tweet(tweet)
+            count += 1
 
             if most_recent_tweet is None:
                 most_recent_tweet = T.created_at
@@ -115,15 +117,15 @@ def getTweets(searchTerm="MLHacks"):
 
             # message = json.dumps(T.getJSON())
             message = T.text+'::'+T.id+'::'+T.retweet+'::'+str(T.created_at)
-            channel.basic_publish(exchange='twitter_exchange', routing_key='', body=message,
-                                  properties=pika.BasicProperties(delivery_mode=2))
-            print(" [x] Sent %r" % message)
+            channel.basic_publish(exchange='',routing_key='twitter_mq', body=message, properties=pika.BasicProperties(delivery_mode=2))
+            # print(" [x] Sent %r" % message)
 
             max_id = T.id
 
+        print("Processed tweet count=%s" % count)
         api_calls += 1
 
-    connection.close()
+    # connection.close()
     # except Exception as e:
         # print(e)
 
