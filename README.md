@@ -1,5 +1,11 @@
-# Anti-harassment speech analyzer
-SayNoToHarassment is an app that updates real-time and shows posts that are likely to contain hate speech and harassment online, integrated with streaming API of twitter for prototyping. It provides a dashboard view of flagged tweets, outlook of how audience is perceiving and posting about on social media.
+# SayNoToHarassment [Best Use of Amazon Web Services Award, MLH Prime (Austin)]
+
+Devpost: https://devpost.com/software/saynotoharassments
+
+SayNoToHarassment is an app that updates real-time and shows posts that are likely to contain hate speech and harassment online, integrated with Twitter's streaming API. It provides a dashboard view of flagged tweets, outlook of how audience is perceiving and posting about on social media.
+
+## Developers
+<img src="https://github.com/audip/speech-sentiment-analyzer/raw/master/developers.JPG" width="560" height="400" />
 
 ## Installation
 - Install package dependencies - `pip install -r requirements.txt`
